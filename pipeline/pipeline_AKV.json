@@ -1,9 +1,9 @@
 {
-	"name": "Colne_PipeLine1",
+	"name": "pipeline_AKV",
 	"properties": {
 		"activities": [
 			{
-				"name": "Copy data12",
+				"name": "Copy data1",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
@@ -18,7 +18,7 @@
 					"source": {
 						"type": "DelimitedTextSource",
 						"storeSettings": {
-							"type": "AzureBlobFSReadSettings",
+							"type": "AzureBlobStorageReadSettings",
 							"recursive": true,
 							"enablePartitionDiscovery": false
 						},
@@ -27,10 +27,15 @@
 						}
 					},
 					"sink": {
-						"type": "SqlServerSink",
-						"writeBehavior": "insert",
-						"sqlWriterUseTableLock": false,
-						"tableOption": "autoCreate"
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
 					},
 					"enableStaging": false,
 					"translator": {
@@ -44,48 +49,18 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "EmployeeDataSet",
+						"referenceName": "ds_blobsource",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "AdfTestSQLDB",
+						"referenceName": "DelimitedText2",
 						"type": "DatasetReference"
 					}
 				]
-			},
-			{
-				"name": "Set variable1",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "Copy data12",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "var_stage",
-					"value": "Sample Value"
-				}
 			}
 		],
-		"variables": {
-			"var_stage": {
-				"type": "String"
-			}
-		},
-		"annotations": [],
-		"lastPublishTime": "2023-05-22T18:38:46Z"
-	},
-	"type": "Microsoft.DataFactory/factories/pipelines"
+		"annotations": []
+	}
 }
