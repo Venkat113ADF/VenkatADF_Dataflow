@@ -1,0 +1,25 @@
+{
+	"name": "CustomEventTrigger",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "CustomEvent_Archive",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "CustomEventsTrigger",
+		"typeProperties": {
+			"subjectEndsWith": "",
+			"subjectBeginsWith": "TestingFromPostMan",
+			"scope": "/subscriptions/c71b92aa-a206-4cf5-905c-5a4d62be4c6f/resourceGroups/rg_group/providers/Microsoft.EventGrid/topics/CustomEventBasedTriggering",
+			"events": [
+				"TriggeredFromADFPipeLine",
+				"EventTriggeredFromPostMan"
+			]
+		}
+	}
+}

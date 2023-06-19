@@ -1,0 +1,72 @@
+{
+	"name": "Import_File_AzureDB_With_param",
+	"properties": {
+		"activities": [
+			{
+				"name": "Load File To DB",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "SqlServerSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"tableOption": "autoCreate"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_Source_dataset",
+						"type": "DatasetReference",
+						"parameters": {
+							"Parama_ds_To_ls_Source": "https://stggentwo.dfs.core.windows.net/",
+							"Param_ds_FileName": "DimPromotion.csv",
+							"Param_ds_RootFolderPath": "source"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_Sink_dataSet",
+						"type": "DatasetReference",
+						"parameters": {
+							"Param_ds_ServerName": "azuresql1134.database.windows.net",
+							"Param_ds_DbName": "adftestdb"
+						}
+					}
+				]
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2023-05-16T13:33:36Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

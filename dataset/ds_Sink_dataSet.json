@@ -1,0 +1,37 @@
+{
+	"name": "ds_Sink_dataSet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AZureSQL_sink",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"lsparam_dbserver": {
+					"value": "@dataset().Param_ds_ServerName",
+					"type": "Expression"
+				},
+				"lsparam_dbname": {
+					"value": "@dataset().Param_ds_DbName",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"Param_ds_ServerName": {
+				"type": "string",
+				"defaultValue": "azuresqlserver113.database.windows.net"
+			},
+			"Param_ds_DbName": {
+				"type": "string",
+				"defaultValue": "sql113"
+			}
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "DimPromotion"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

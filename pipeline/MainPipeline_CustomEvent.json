@@ -1,0 +1,163 @@
+{
+	"name": "MainPipeline_CustomEvent",
+	"properties": {
+		"activities": [
+			{
+				"name": "Blob_to_SQL",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_CustomEvent_source",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_CustomEventSink",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Copy_File_to_TransientStorage",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Blob_to_SQL",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_CustomEvent_source",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_CustomEventblobSink",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Sendinginfo_to_EventGridTopic",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Copy_File_to_TransientStorage",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://customeventbasedtriggering.southeastasia-1.eventgrid.azure.net/api/events?aeg-sas-key=PgmAjnVt3RMZzMKXJM3FI/VMThCHfZS1kbx6TpZuLxA=",
+					"method": "POST",
+					"headers": {
+						"aeg-sas-key": "PgmAjnVt3RMZzMKXJM3FI/VMThCHfZS1kbx6TpZuLxA="
+					},
+					"body": {
+						"value": "[\n{\n    \"topic\": \"\",\n    \"subject\": \"TestingFromPostMan\",\n    \"id\": \"SampleID\",\n    \"eventType\": \"TriggeredFromADFPipeLine\",\n    \"eventTime\": \"@{pipeline().TriggerTime}\"\n    \n  }\n  ]",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "Triggers_Demos"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-06-04T02:01:26Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

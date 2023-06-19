@@ -1,0 +1,20 @@
+{
+	"name": "ds_CustomEvent_Parquet_Archive",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_CustomEvent_Archive",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "archive"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

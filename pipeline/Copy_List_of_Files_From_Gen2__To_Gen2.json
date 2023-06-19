@@ -1,0 +1,58 @@
+{
+	"name": "Copy_List_of_Files_From_Gen2__To_Gen2",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy_List_of_Files_To_Gen2",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "BinarySource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"fileListPath": "source/List_Of_Files.txt",
+							"deleteFilesAfterCompletion": false
+						},
+						"formatSettings": {
+							"type": "BinaryReadSettings"
+						}
+					},
+					"sink": {
+						"type": "BinarySink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "Gen2_List_Of_File_dataSet",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "Output_gen2_dataSet",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "CopyFiles_To_Storages_PipeLines"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-05-16T09:39:14Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,17 @@
+{
+	"name": "ADFTestSQLDBDataset",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureSQLConn",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "AutoCreatedEmployee"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

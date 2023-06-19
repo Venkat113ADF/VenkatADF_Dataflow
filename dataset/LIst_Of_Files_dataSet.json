@@ -1,0 +1,18 @@
+{
+	"name": "LIst_Of_Files_dataSet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_Blob_storage_Source",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "source"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

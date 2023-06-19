@@ -1,0 +1,31 @@
+{
+	"name": "ds_SourceFileConfig",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_ADLGen2_Source",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"SourceFilename": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().SourceFilename",
+					"type": "Expression"
+				},
+				"fileSystem": "source"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

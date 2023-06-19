@@ -1,0 +1,18 @@
+{
+	"name": "Output_gen2_dataSet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_Gen2_destination",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileSystem": "destination"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

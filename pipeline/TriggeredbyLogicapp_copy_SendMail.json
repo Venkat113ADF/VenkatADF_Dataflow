@@ -1,0 +1,95 @@
+{
+	"name": "TriggeredbyLogicapp_copy_SendMail",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copyblobtosql",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_logicapp_blob",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_sqlsink",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Web1",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Copyblobtosql",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://prod-20.southindia.logic.azure.com:443/workflows/b91bee1ae13847bb92133606296c987f/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=8Z_mxgYCZ_vP0N9trKjaGy0ZuMEy0y9p9tKn3gLHt5c",
+					"method": "POST",
+					"body": {
+						"value": "{\n    \"properties\":{\n        \"DataFactoryname\":\"@{pipeline().DataFactory}\",\n        \"PipeLineName\":\"@{pipeline().Pipeline}\",\n        \"EmailTo\":\"kuna.venkatarao10@gmail.com\",\n        \"Subject\":\" Execution details of run id @{pipeline().RunId}\",\n        \"Status\":\"@{activity('Copyblobtosql').output.executionDetails[0].status}\",\n        \"RowsInserted\":\"@{activity('Copyblobtosql').output.rowsCopied}\",\n        \"RowsSkipped\":\"No Skipped Records\",\n        \"ErrorMessage\":\"No ErrorMessage\"\n    },\n    \"type\":\"object\"\n}\n",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "LogicApps_pipelines"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-06-02T02:28:35Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

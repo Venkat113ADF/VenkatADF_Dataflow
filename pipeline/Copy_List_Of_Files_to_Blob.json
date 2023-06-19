@@ -1,0 +1,59 @@
+{
+	"name": "Copy_List_Of_Files_to_Blob",
+	"properties": {
+		"description": "Copy list of file to blob storage ",
+		"activities": [
+			{
+				"name": "Copy_List_Of_Files",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "BinarySource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"fileListPath": "source/List_Of_Files.txt",
+							"deleteFilesAfterCompletion": false
+						},
+						"formatSettings": {
+							"type": "BinaryReadSettings"
+						}
+					},
+					"sink": {
+						"type": "BinarySink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "LIst_Of_Files_dataSet",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "outputdataset",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "CopyFiles_To_Storages_PipeLines"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-05-16T09:39:14Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

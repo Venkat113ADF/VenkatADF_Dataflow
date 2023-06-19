@@ -1,0 +1,17 @@
+{
+	"name": "ds_AzureSQLDestination",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureSQLDB_Sink",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Employee"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

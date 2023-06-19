@@ -1,0 +1,36 @@
+{
+	"name": "ds_JobTitle_Souce",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_stgblob_source",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "DF_Datasets"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "Job_Titles.csv",
+				"container": "source"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "JobID",
+				"type": "String"
+			},
+			{
+				"name": "Job Title",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

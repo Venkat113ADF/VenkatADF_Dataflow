@@ -1,0 +1,271 @@
+{
+	"name": "Loop_Files_Based_Config",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get_All_Config_Values",
+				"description": "Get All Config values with Source files and destination tables",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"dataset": {
+						"referenceName": "ds_configvalues",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Loop Each File",
+				"description": "Loop Through Each file to check whether a file exists or not .\nIf the File exists then load to Database table else do nothing",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get_All_Config_Values",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get_All_Config_Values').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Get File Name From Loop",
+							"description": "Get File Name From looping",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "var_test",
+								"value": {
+									"value": "@item().SourceFileName",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Get Metadata of File",
+							"description": "Get Metadata of File about File information",
+							"type": "GetMetadata",
+							"dependsOn": [
+								{
+									"activity": "Get File Name From Loop",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "ds_srcfile",
+									"type": "DatasetReference",
+									"parameters": {
+										"param_sourcefilename": {
+											"value": "@item().SourceFileName",
+											"type": "Expression"
+										}
+									}
+								},
+								"fieldList": [
+									"exists",
+									"itemName",
+									"itemType",
+									"lastModified"
+								],
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							}
+						},
+						{
+							"name": "Check File Exists or Not",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "Get Metadata of File",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@activity('Get Metadata of File').output.exists\n",
+									"type": "Expression"
+								},
+								"ifFalseActivities": [
+									{
+										"name": "Get File Name",
+										"type": "SetVariable",
+										"dependsOn": [],
+										"policy": {
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"variableName": "var_test",
+											"value": "File Not Exists"
+										}
+									}
+								],
+								"ifTrueActivities": [
+									{
+										"name": "Get File Name From Get Metadata",
+										"description": "Get File Name for Debug purpose",
+										"type": "SetVariable",
+										"dependsOn": [],
+										"policy": {
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"variableName": "var_test",
+											"value": "File exists"
+										}
+									},
+									{
+										"name": "Load File to DB Table",
+										"type": "Copy",
+										"dependsOn": [
+											{
+												"activity": "Get File Name From Get Metadata",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "DelimitedTextSource",
+												"storeSettings": {
+													"type": "AzureBlobFSReadSettings",
+													"recursive": true,
+													"enablePartitionDiscovery": false
+												},
+												"formatSettings": {
+													"type": "DelimitedTextReadSettings"
+												}
+											},
+											"sink": {
+												"type": "AzureSqlSink",
+												"writeBehavior": "insert",
+												"sqlWriterUseTableLock": false,
+												"tableOption": "autoCreate",
+												"disableMetricsCollection": false
+											},
+											"enableStaging": false,
+											"enableSkipIncompatibleRow": false,
+											"translator": {
+												"type": "TabularTranslator",
+												"typeConversion": true,
+												"typeConversionSettings": {
+													"allowDataTruncation": true,
+													"treatBooleanAsNumber": false
+												}
+											}
+										},
+										"inputs": [
+											{
+												"referenceName": "ds_SourceFile",
+												"type": "DatasetReference",
+												"parameters": {
+													"ds_Param_SourceFileName": {
+														"value": "@activity('Get Metadata of File').output.itemName",
+														"type": "Expression"
+													}
+												}
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "ds_SQLDynamic",
+												"type": "DatasetReference",
+												"parameters": {
+													"DestinationTableName": {
+														"value": "@item().DestinationTable",
+														"type": "Expression"
+													},
+													"DestinationSchemaName": {
+														"value": "@item().DestinationSchema_Target",
+														"type": "Expression"
+													}
+												}
+											}
+										]
+									}
+								]
+							}
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"var_test": {
+				"type": "String",
+				"defaultValue": "1"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-05-19T15:04:06Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

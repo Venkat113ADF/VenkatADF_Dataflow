@@ -1,0 +1,36 @@
+{
+	"name": "ds_Dynamic_ExcelSourceFile",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_ADLGen2_Source",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"Param_ExcelFileName": {
+				"type": "string"
+			},
+			"Param_SheetName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"sheetName": {
+				"value": "@dataset().Param_SheetName",
+				"type": "Expression"
+			},
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().Param_ExcelFileName",
+					"type": "Expression"
+				},
+				"fileSystem": "source"
+			},
+			"firstRowAsHeader": true
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

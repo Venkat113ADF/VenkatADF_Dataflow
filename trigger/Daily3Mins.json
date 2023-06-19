@@ -1,0 +1,25 @@
+{
+	"name": "Daily3Mins",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "Copy File From Blob To ADLS Gen2_TriggerDemo",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Minute",
+				"interval": 3,
+				"startTime": "2023-05-20T02:38:00Z",
+				"endTime": "2023-05-21T02:44:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

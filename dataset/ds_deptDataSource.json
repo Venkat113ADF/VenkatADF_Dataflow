@@ -1,0 +1,36 @@
+{
+	"name": "ds_deptDataSource",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_stgblob_source",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "DF_Datasets"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "Dept_details.csv",
+				"container": "source"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "DeptID",
+				"type": "String"
+			},
+			{
+				"name": "Department",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

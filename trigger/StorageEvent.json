@@ -1,0 +1,24 @@
+{
+	"name": "StorageEvent",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "Auto_Archive_File_pipeLine",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/transientstorage/blobs/",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/c71b92aa-a206-4cf5-905c-5a4d62be4c6f/resourceGroups/rg_group/providers/Microsoft.Storage/storageAccounts/stgblob123",
+			"events": [
+				"Microsoft.Storage.BlobCreated"
+			]
+		}
+	}
+}

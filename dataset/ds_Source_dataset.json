@@ -1,0 +1,53 @@
+{
+	"name": "ds_Source_dataset",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_ADLSGen2_Src",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"lsparam_source": {
+					"value": "@dataset().Parama_ds_To_ls_Source",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"Parama_ds_To_ls_Source": {
+				"type": "string",
+				"defaultValue": "https://stggentwo.dfs.core.windows.net/"
+			},
+			"Param_ds_FileName": {
+				"type": "string",
+				"defaultValue": "DimPromotion.csv"
+			},
+			"Param_ds_RootFolderPath": {
+				"type": "string",
+				"defaultValue": "source"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().Param_ds_FileName",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().Param_ds_RootFolderPath",
+					"type": "Expression"
+				}
+			},
+			"columnDelimiter": "|",
+			"escapeChar": "\\",
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,31 @@
+{
+	"name": "ds_AzureSQL_Dynamic",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureSQLDB_Sink",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"Object_Schema_Name": {
+				"type": "string"
+			},
+			"Object_Name": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().Object_Schema_Name",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().Object_Name",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

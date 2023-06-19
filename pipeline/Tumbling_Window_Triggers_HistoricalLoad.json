@@ -1,0 +1,86 @@
+{
+	"name": "Tumbling_Window_Triggers_HistoricalLoad",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[dbo].[Proc_load_FactResellerSales]",
+						"storedProcedureParameters": {
+							"EndDate": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.Param_EndDate",
+									"type": "Expression"
+								}
+							},
+							"StartDate": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.Param_StatDate",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_FactResellerSales_Source1",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_FactReseller_dest",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"parameters": {
+			"Param_StatDate": {
+				"type": "string",
+				"defaultValue": "2010-01-01"
+			},
+			"Param_EndDate": {
+				"type": "string",
+				"defaultValue": "2011-01-01"
+			}
+		},
+		"folder": {
+			"name": "Triggers_Demos"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-06-06T02:54:38Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

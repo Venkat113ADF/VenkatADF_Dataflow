@@ -1,0 +1,33 @@
+{
+	"name": "ds_Jobtitledata",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_stgblob_source",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "Job_Titles.csv",
+				"container": "source"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "JobID",
+				"type": "String"
+			},
+			{
+				"name": "Job Title",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

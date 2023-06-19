@@ -1,0 +1,60 @@
+{
+	"name": "Move_PreFix_Multiple_files_Blob",
+	"properties": {
+		"description": "Move Multiple Files Based on prefix \"F\"",
+		"activities": [
+			{
+				"name": "Move_Mulitiple_Files_To_Blob",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "BinarySource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"prefix": "F",
+							"deleteFilesAfterCompletion": false
+						},
+						"formatSettings": {
+							"type": "BinaryReadSettings"
+						}
+					},
+					"sink": {
+						"type": "BinarySink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "MulitipleFilesdataset",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "outputdataset",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "CopyFiles_To_Storages_PipeLines"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-05-16T09:39:14Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

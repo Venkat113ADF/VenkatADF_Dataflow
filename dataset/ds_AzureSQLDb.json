@@ -1,0 +1,17 @@
+{
+	"name": "ds_AzureSQLDb",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureSource1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Dimpromotion1"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

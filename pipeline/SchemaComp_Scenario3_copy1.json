@@ -1,0 +1,375 @@
+{
+	"name": "SchemaComp_Scenario3_copy1",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get_Ref_Schema",
+				"type": "GetMetadata",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "ds_sourceFileSchema",
+						"type": "DatasetReference"
+					},
+					"fieldList": [
+						"structure"
+					],
+					"storeSettings": {
+						"type": "AzureBlobStorageReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
+					}
+				}
+			},
+			{
+				"name": "Scenario3InputFile",
+				"type": "GetMetadata",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "ds_sourceSchemaInput",
+						"type": "DatasetReference",
+						"parameters": {
+							"InputFileName": {
+								"value": "@pipeline().parameters.Scenarion3InputFilename",
+								"type": "Expression"
+							}
+						}
+					},
+					"fieldList": [
+						"structure"
+					],
+					"storeSettings": {
+						"type": "AzureBlobStorageReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
+					}
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get_Ref_Schema",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Scenario3InputFile",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get_Ref_Schema').output.structure",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Compare_schemas_copy1",
+							"type": "IfCondition",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@contains(activity('Scenario3InputFile').output.structure,item())",
+									"type": "Expression"
+								},
+								"ifFalseActivities": [
+									{
+										"name": "ColumnIsNotAvailable",
+										"type": "SetVariable",
+										"dependsOn": [],
+										"policy": {
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"variableName": "var_column_Comp_status",
+											"value": "1"
+										}
+									}
+								],
+								"ifTrueActivities": [
+									{
+										"name": "Wait1",
+										"type": "Wait",
+										"dependsOn": [],
+										"userProperties": [],
+										"typeProperties": {
+											"waitTimeInSeconds": 1
+										}
+									}
+								]
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "If Condition1",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "ForEach1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(variables('var_column_Comp_status'), 1)",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Scenario3InputLoad_copy1_copy1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"storeSettings": {
+										"type": "AzureBlobStorageReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false,
+									"tableOption": "autoCreate",
+									"disableMetricsCollection": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"name": "FirstName",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "FirstName",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "LastName",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "LastName",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "Email",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "Email",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "Phone",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "Phone",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "Gender",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "Gender",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "Department",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "Department",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "JobTitle",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "JobTitle",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "YearsOfExperience",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "YearsOfExperience",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "Salary",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "Salary",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										}
+									],
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_sourceSchemaInput",
+									"type": "DatasetReference",
+									"parameters": {
+										"InputFileName": {
+											"value": "@pipeline().parameters.Scenarion3InputFilename",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_sqlsink",
+									"type": "DatasetReference"
+								}
+							]
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "ColumnIsAvilable_copy1",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "var_column_Comp_status",
+								"value": "Column is not available"
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"Scenarion1InputFileName": {
+				"type": "string",
+				"defaultValue": "Employees.csv"
+			},
+			"Scenarion2InputFilename": {
+				"type": "string",
+				"defaultValue": "Employees_OrderOf_Columns_Changed.csv"
+			},
+			"Scenarion3InputFilename": {
+				"type": "string",
+				"defaultValue": "Employees_addtional_columns.csv"
+			}
+		},
+		"variables": {
+			"var_column_Comp_status": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "Expilcit_Schema_Valid_demos"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-05-23T19:11:45Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

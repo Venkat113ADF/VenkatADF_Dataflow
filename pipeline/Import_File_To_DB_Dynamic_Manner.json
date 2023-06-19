@@ -1,0 +1,297 @@
+{
+	"name": "Import_File_To_DB_Dynamic_Manner",
+	"properties": {
+		"description": "Import Excel File to DB Table and redirect error records to other destinations or file",
+		"activities": [
+			{
+				"name": "Import FIle To DB",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "ExcelSource",
+						"additionalColumns": [
+							{
+								"name": "Pipeline_RunID",
+								"value": {
+									"value": "@pipeline().RunId",
+									"type": "Expression"
+								}
+							},
+							{
+								"name": "Pipeline_Name",
+								"value": {
+									"value": "@pipeline().Pipeline",
+									"type": "Expression"
+								}
+							},
+							{
+								"name": "File_Path",
+								"value": "$$FILEPATH"
+							},
+							{
+								"name": "FileName",
+								"value": {
+									"value": "@pipeline().parameters.FileName",
+									"type": "Expression"
+								}
+							},
+							{
+								"name": "TableName",
+								"value": {
+									"value": "@concat(pipeline().parameters.SchemaName,'.',pipeline().parameters.TableName)",
+									"type": "Expression"
+								}
+							},
+							{
+								"name": "SheetName",
+								"value": {
+									"value": "@pipeline().parameters.sheetName",
+									"type": "Expression"
+								}
+							}
+						],
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"enableSkipIncompatibleRow": true,
+					"logSettings": {
+						"enableCopyActivityLog": true,
+						"copyActivityLogSettings": {
+							"logLevel": "Warning",
+							"enableReliableLogging": true
+						},
+						"logLocationSettings": {
+							"linkedServiceName": {
+								"referenceName": "ls_Gen2_errorLogging",
+								"type": "LinkedServiceReference"
+							},
+							"path": "logging"
+						}
+					},
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_Dynamic_ExcelSourceFile",
+						"type": "DatasetReference",
+						"parameters": {
+							"Param_ExcelFileName": {
+								"value": "@pipeline().parameters.FileName",
+								"type": "Expression"
+							},
+							"Param_SheetName": {
+								"value": "@pipeline().parameters.sheetName",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_AzureSQL_Dynamic",
+						"type": "DatasetReference",
+						"parameters": {
+							"Object_Schema_Name": {
+								"value": "@pipeline().parameters.SchemaName",
+								"type": "Expression"
+							},
+							"Object_Name": {
+								"value": "@pipeline().parameters.TableName",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Import FIle To DB",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "var_PipeLine_StartDateTime",
+					"value": {
+						"value": "@activity('Import FIle To DB').output.executionDetails[0].start",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Proc_Log_Execution_Details",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[Insert_PipeLine_Execution_log]",
+					"storedProcedureParameters": {
+						"DestSchemaName": {
+							"value": {
+								"value": "@pipeline().parameters.SchemaName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"DestTableName": {
+							"value": {
+								"value": "@pipeline().parameters.TableName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"ExecutionDuration": {
+							"value": {
+								"value": "@activity('Import FIle To DB').output.executionDetails[0].duration",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"ExecutionStatus": {
+							"value": {
+								"value": "@activity('Import FIle To DB').output.executionDetails[0].status",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"LogFilePath": {
+							"value": {
+								"value": "@activity('Import FIle To DB').output.logFilePath",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"Pipeline_Exe_EndDateTime": {
+							"value": null,
+							"type": "DateTime"
+						},
+						"Pipeline_Exe_StartDateTime": {
+							"value": {
+								"value": "@activity('Import FIle To DB').output.executionDetails[0].start",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"PipelineRunID": {
+							"value": {
+								"value": "@pipeline().RunId",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"RowsReadFromSource": {
+							"value": {
+								"value": "@activity('Import FIle To DB').output.rowsRead",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"RowsSkipped": {
+							"value": {
+								"value": "@activity('Import FIle To DB').output.rowsSkipped",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"RowsWrittenToDestination": {
+							"value": {
+								"value": "@activity('Import FIle To DB').output.rowsCopied",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"SourceFileName": {
+							"value": {
+								"value": "@pipeline().parameters.FileName",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_AzureSQLDB_Sink",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"FileName": {
+				"type": "string",
+				"defaultValue": "AdventureWorks_Returns.xlsx"
+			},
+			"SchemaName": {
+				"type": "string",
+				"defaultValue": "dbo"
+			},
+			"TableName": {
+				"type": "string",
+				"defaultValue": "AdventureWorks_Returns"
+			},
+			"sheetName": {
+				"type": "string",
+				"defaultValue": "AdventureWorks_Returns"
+			}
+		},
+		"variables": {
+			"var_PipeLine_StartDateTime": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-05-20T18:29:47Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

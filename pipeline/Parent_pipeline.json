@@ -1,0 +1,23 @@
+{
+	"name": "Parent_pipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "Colne_PipeLine1",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Colne_PipeLine1",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2023-05-17T21:08:11Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,32 @@
+{
+	"name": "ds_dynamicSourceFile",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_ADLGen2_Source",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"Param_SourceFile": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().Param_SourceFile",
+					"type": "Expression"
+				},
+				"fileSystem": "source"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

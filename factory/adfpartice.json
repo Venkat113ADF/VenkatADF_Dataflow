@@ -1,0 +1,14 @@
+{
+	"name": "adfpartice",
+	"properties": {
+		"globalConfigurations": {
+			"PipelineBillingEnabled": "false"
+		}
+	},
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "a7ab91f1-8827-45fa-8ac9-2d5b75a2d0a8",
+		"tenantId": "98403667-7127-4b76-8df5-f08e9e8056f8"
+	}
+}

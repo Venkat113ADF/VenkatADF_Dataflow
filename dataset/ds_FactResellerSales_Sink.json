@@ -1,0 +1,17 @@
+{
+	"name": "ds_FactResellerSales_Sink",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureSQLDB_Sink",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "FactResellerSales"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,182 @@
+{
+	"name": "Import_File_To_DB_copy1",
+	"properties": {
+		"description": "Import File to DB Table and redirect error records to other destinations or log files.\nNote: If the redirected records count is zero then delete the blank file",
+		"activities": [
+			{
+				"name": "Import FIle To DB",
+				"description": "Import File to DB Table and redirect error records to other destinations or log files.\nNote: If the redirected records count is zero then delete the blank log files",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"enableSkipIncompatibleRow": true,
+					"logSettings": {
+						"enableCopyActivityLog": true,
+						"copyActivityLogSettings": {
+							"logLevel": "Warning",
+							"enableReliableLogging": true
+						},
+						"logLocationSettings": {
+							"linkedServiceName": {
+								"referenceName": "ls_Gen2_errorLogging",
+								"type": "LinkedServiceReference"
+							},
+							"path": "logging"
+						}
+					},
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_dynamicSourceFile",
+						"type": "DatasetReference",
+						"parameters": {
+							"Param_SourceFile": {
+								"value": "@pipeline().parameters.FileName",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_AzureSQL_Dynamic",
+						"type": "DatasetReference",
+						"parameters": {
+							"Object_Schema_Name": {
+								"value": "@pipeline().parameters.SchemaName",
+								"type": "Expression"
+							},
+							"Object_Name": {
+								"value": "@pipeline().parameters.TableName",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "If Condtion",
+				"description": "Check RowSkipped count is more than zero",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Import FIle To DB",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@greater(int(activity('Import FIle To DB').output.rowsSkipped),0)",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Delete1",
+							"type": "Delete",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "datasetloggin",
+									"type": "DatasetReference",
+									"parameters": {
+										"ds_param_folderName": {
+											"value": "@activity('Import FIle To DB').output.logFilePath",
+											"type": "Expression"
+										}
+									}
+								},
+								"enableLogging": false,
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								}
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Wait1",
+							"type": "Wait",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": 1
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"FileName": {
+				"type": "string",
+				"defaultValue": "nebraska-history_Incorrect_file.csv"
+			},
+			"SchemaName": {
+				"type": "string",
+				"defaultValue": "dbo"
+			},
+			"TableName": {
+				"type": "string",
+				"defaultValue": "Nebraska_History"
+			}
+		},
+		"variables": {
+			"Incorrect_record_Count": {
+				"type": "String"
+			}
+		},
+		"annotations": [
+			"If redirect records count is zero then delete blank file"
+		],
+		"lastPublishTime": "2023-05-20T18:45:25Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

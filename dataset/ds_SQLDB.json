@@ -1,0 +1,17 @@
+{
+	"name": "ds_SQLDB",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_SQLDB",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "alaska_history"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

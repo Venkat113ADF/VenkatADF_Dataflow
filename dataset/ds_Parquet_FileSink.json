@@ -1,0 +1,24 @@
+{
+	"name": "ds_Parquet_FileSink",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_ADLGen2_Source",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@formatDateTime(utcnow())",
+					"type": "Expression"
+				},
+				"fileSystem": "archive"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
