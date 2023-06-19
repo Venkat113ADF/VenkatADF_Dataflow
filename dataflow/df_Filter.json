@@ -1,0 +1,87 @@
+{
+	"name": "df_Filter",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_FloridadataSource",
+						"type": "DatasetReference"
+					},
+					"name": "FloridaCoviddata"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_FilterDatads",
+						"type": "DatasetReference"
+					},
+					"name": "sinkGreatethan140deaths"
+				}
+			],
+			"transformations": [
+				{
+					"name": "FilterDealthIncrease"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          date as string,",
+				"          state as string,",
+				"          death as string,",
+				"          deathConfirmed as string,",
+				"          deathIncrease as string,",
+				"          deathProbable as string,",
+				"          hospitalized as string,",
+				"          hospitalizedCumulative as string,",
+				"          hospitalizedCurrently as string,",
+				"          hospitalizedIncrease as string,",
+				"          inIcuCumulative as string,",
+				"          inIcuCurrently as string,",
+				"          negative as string,",
+				"          negativeIncrease as string,",
+				"          negativeTestsAntibody as string,",
+				"          negativeTestsPeopleAntibody as string,",
+				"          negativeTestsViral as string,",
+				"          onVentilatorCumulative as string,",
+				"          onVentilatorCurrently as string,",
+				"          positive as string,",
+				"          positiveCasesViral as string,",
+				"          positiveIncrease as string,",
+				"          positiveScore as string,",
+				"          positiveTestsAntibody as string,",
+				"          positiveTestsAntigen as string,",
+				"          positiveTestsPeopleAntibody as string,",
+				"          positiveTestsPeopleAntigen as string,",
+				"          positiveTestsViral as string,",
+				"          recovered as string,",
+				"          totalTestEncountersViral as string,",
+				"          totalTestEncountersViralIncrease as string,",
+				"          totalTestResults as string,",
+				"          totalTestResultsIncrease as string,",
+				"          totalTestsAntibody as string,",
+				"          totalTestsAntigen as string,",
+				"          totalTestsPeopleAntibody as string,",
+				"          totalTestsPeopleAntigen as string,",
+				"          totalTestsPeopleViral as string,",
+				"          totalTestsPeopleViralIncrease as string,",
+				"          totalTestsViral as string,",
+				"          totalTestsViralIncrease as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> FloridaCoviddata",
+				"FloridaCoviddata filter(greater(toInteger(deathIncrease), 140),",
+				"     partitionBy('hash', 1)) ~> FilterDealthIncrease",
+				"FilterDealthIncrease sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['FloridaFilterdata.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sinkGreatethan140deaths"
+			]
+		}
+	}
+}

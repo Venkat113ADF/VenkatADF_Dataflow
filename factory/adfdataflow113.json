@@ -1,0 +1,9 @@
+{
+	"name": "adfdataflow113",
+	"location": "southindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "ea035fab-1fa7-4177-b749-aceb7b96c146",
+		"tenantId": "98403667-7127-4b76-8df5-f08e9e8056f8"
+	}
+}

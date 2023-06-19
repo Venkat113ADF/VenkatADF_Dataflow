@@ -1,0 +1,78 @@
+{
+	"name": "df_union",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_EmployeeSource1",
+						"type": "DatasetReference"
+					},
+					"name": "dfEmployeesource"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_EmployeeSource2",
+						"type": "DatasetReference"
+					},
+					"name": "dfemployeesource1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "UnionFileoutput",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "union1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          {First Name} as string,",
+				"          {Last Name} as string,",
+				"          Email as string,",
+				"          Phone as string,",
+				"          Gender as string,",
+				"          DepartmentID as string,",
+				"          JobID as string,",
+				"          {Years Of Experience} as string,",
+				"          Salary as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> dfEmployeesource",
+				"source(output(",
+				"          {First Name} as string,",
+				"          {Last Name} as string,",
+				"          Email as string,",
+				"          Phone as string,",
+				"          Gender as string,",
+				"          DepartmentID as string,",
+				"          JobID as string,",
+				"          {Years Of Experience} as string,",
+				"          Salary as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> dfemployeesource1",
+				"dfEmployeesource, dfemployeesource1 union(byName: true,",
+				"     partitionBy('hash', 1))~> union1",
+				"union1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Column_1 as string,",
+				"          Column_2 as string",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}
