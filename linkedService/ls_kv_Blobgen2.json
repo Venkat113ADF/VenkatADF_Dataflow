@@ -1,0 +1,11 @@
+{
+	"name": "ls_kv_Blobgen2",
+	"properties": {
+		"description": "Linked service for stage two storage\n",
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://KV-DEV-Storage1.vault.azure.net/"
+		}
+	}
+}
