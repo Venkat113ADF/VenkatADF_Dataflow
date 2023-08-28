@@ -1,0 +1,19 @@
+{
+	"name": "EmployeeDataSet_1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_ADLGen2_Source",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Employee.xlsx",
+				"fileSystem": "source"
+			}
+		},
+		"schema": []
+	}
+}
